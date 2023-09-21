@@ -17,7 +17,7 @@ def train_step(
     dataloader: torch.utils.data.DataLoader,
     loss_fn: torch.nn.Module,
     optimizer: torch.optim.Optimizer,
-    scheduler: torch.optim.lr_scheduler,
+    scheduler: torch.optim.lr_scheduler = None,
     device=torch.device,
 ) -> Tuple[float, float]:
     """Trains a PyTorch model for a single epoch
@@ -70,7 +70,10 @@ def train_step(
         train_pred_class = torch.argmax(torch.softmax(train_pred, dim=1), dim=1)
         train_acc += (train_pred_class == y).sum().item() / len(train_pred)
 
-    scheduler.step()
+    if scheduler:
+        scheduler.step()
+    else:
+        pass
 
     # Adjust metrics to get average loss and accuracy per batch
     train_loss /= len(dataloader)
@@ -143,10 +146,10 @@ def train(
     train_dataloader: torch.utils.data.DataLoader,
     test_dataloader: torch.utils.data.DataLoader,
     optimizer: torch.optim.Optimizer,
-    scheduler: torch.optim.lr_scheduler,
     loss_fn: torch.nn.Module,
     epochs: int,
     device=torch.device,
+    scheduler: torch.optim.lr_scheduler = None,
 ) -> Dict[str, List[float]]:
     """Trains and tests a PyTorch model.
 
