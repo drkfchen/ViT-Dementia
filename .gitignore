@@ -3,3 +3,4 @@ __pycache__/
 .vscode/
 *.zip
 .DS_STORE
+.venv
