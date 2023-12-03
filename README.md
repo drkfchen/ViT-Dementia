@@ -1,4 +1,4 @@
-# Vision-Transformer
+# ViT: Vision Transformer for Early Dementia Detection
 An attempt to replicate a Vision Transformer Architecture from the paper [An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/pdf/2010.11929v2.pdf)
 
 ## [Dataset](https://www.kaggle.com/datasets/khoongweihao/covid19-xray-dataset-train-test-sets)
