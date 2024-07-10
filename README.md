@@ -1,3 +1,22 @@
+# How to run the code
+```python
+# Create conda environment from the provided file
+conda env create -f env.yml
+```
+```python
+# Train the model
+python train.py # To train the model built from scratch
+python train_transferlearning.py # To train the pre-trained model and fine-tune it according to your data
+```
+```python
+# To see and plot the loss curve (in notebook)
+from functions import helper_functions
+
+with open('pickle file path', 'rb') as f:
+  results = pd.read_pickle(f)
+
+helper_functions.plot_loss_curves(results)
+```
 # ViT: Vision Transformer for Early Dementia Detection
 An attempt to replicate a Vision Transformer Architecture from the paper [An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/pdf/2010.11929v2.pdf)
 
