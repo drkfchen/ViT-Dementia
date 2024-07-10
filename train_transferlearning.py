@@ -1,7 +1,7 @@
 import torch, torchvision
 import argparse
 from torch import nn
-from torchvision import models
+from torchvision import models, transforms
 from pathlib import Path
 from functions import data_setup, engine, helper_functions, model_builder, utils
 
@@ -13,13 +13,16 @@ elif torch.backends.mps.is_available():
 else:
     device = "cpu"
 
+# Set the model name
+model_name = "ViTModelTransferLearning"
+
 # Set the weights of the pretrained model
 weights = (
     torchvision.models.ViT_B_16_Weights.DEFAULT
 )  # "DEFAULT" means the best available weights
 
 # Set the transform pipeline
-auto_transform = weights.transforms()
+training_transform = weights.transforms()
 
 simple_transform = transforms.Compose(
     [transforms.Resize(size=(224, 224)), transforms.ToTensor()]
@@ -70,13 +73,14 @@ args = parser.parse_args()
 BATCH_SIZE = args.batch_size
 NUM_EPOCHS = args.epochs
 LEARNING_RATE = args.lr
-print(f"[INFO] Training the model for {NUM_EPOCHS} with batch size of {BATCH_SIZE}")
+print(f"[INFO] Training the model for {NUM_EPOCHS} epochs with batch size of {BATCH_SIZE}")
 
 # Setup directories
 train_dir = args.train_dir
 test_dir = args.test_dir
 print(f"[INFO] Training data file: {train_dir}")
 print(f"[INFO] Testing data file: {test_dir}")
+print(f"[INFO] Model trained on: {device}!")
 
 (
     train_dataloader_pretrained,
@@ -85,7 +89,7 @@ print(f"[INFO] Testing data file: {test_dir}")
 ) = data_setup.create_dataloaders(
     train_dir=train_dir,
     test_dir=test_dir,
-    train_transform=auto_transform,
+    train_transform=training_transform,
     transform=simple_transform,
     batch_size=BATCH_SIZE,
 )
@@ -107,6 +111,7 @@ loss_fn = nn.CrossEntropyLoss()
 
 results_transfer = engine.train(
     model=ViTModelTransfer,
+    model_name=model_name,
     train_dataloader=train_dataloader_pretrained,
     test_dataloader=test_dataloader_pretrained,
     optimizer=optimizer,
@@ -120,5 +125,5 @@ results_transfer = engine.train(
 utils.save_model(
     model=ViTModelTransfer,
     target_dir="models",
-    model_name="ViTModelTransferLearning90E.pth",
+    model_name=f"{model_name}.pth",
 )

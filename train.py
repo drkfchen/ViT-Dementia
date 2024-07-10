@@ -10,6 +10,9 @@ from functions import data_setup, engine, helper_functions, model_builder, utils
 
 from pathlib import Path
 
+# Set the model name
+model_name = "ViTModel"
+
 # Create device agnostic code
 if torch.cuda.is_available():
     device = "cuda"
@@ -87,7 +90,7 @@ parser.add_argument(
 parser.add_argument(
     "--num_classes",
     type=int,
-    default=2,
+    default=4,
     help="Number of classes for the transformer encoder",
 )
 
@@ -104,14 +107,22 @@ EMBEDDING_DIM = args.embedding_dim
 MLP_SIZE = args.mlp_size
 NUM_HEADS = args.num_heads
 NUM_CLASSES = args.num_classes
-print(f"[INFO] Training the model for {NUM_EPOCHS} with batch size of {BATCH_SIZE}")
+print(f"[INFO] Training the model for {NUM_EPOCHS} epochs with batch size of {BATCH_SIZE}")
 
 # Setup directories
 train_dir = args.train_dir
 test_dir = args.test_dir
 print(f"[INFO] Training data file: {train_dir}")
 print(f"[INFO] Testing data file: {test_dir}")
+print(f"[INFO] Model trained using:  {device}")
 
+# Data Augmentation for Training data
+training_transform = transforms.Compose([
+    transforms.Resize(size=(256, 256)),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
 
 # Transform images into tensor
 simple_transform = transforms.Compose(
@@ -123,7 +134,7 @@ train_dataloader, test_dataloader, class_names = data_setup.create_dataloaders(
     train_dir=train_dir,
     test_dir=test_dir,
     batch_size=BATCH_SIZE,
-    train_transform=simple_transform,
+    train_transform=training_transform,
     transform=simple_transform,
 )
 
@@ -159,6 +170,7 @@ else:
 
 results = engine.train(
     model=ViTModel,
+    model_name=model_name,
     train_dataloader=train_dataloader,
     test_dataloader=test_dataloader,
     optimizer=optimizer,
@@ -168,4 +180,5 @@ results = engine.train(
     device=device,
 )
 
-utils.save_model(model=ViTModel, target_dir="models", model_name="ViTModelV1.pth")
+# Make sure you have the models directory created in your project
+utils.save_model(model=ViTModel, target_dir="models", model_name=f"{model_name}.pth")
