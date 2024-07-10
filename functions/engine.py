@@ -5,6 +5,7 @@ Contains functions for training and testing PyTorch model.
 from typing import Dict, List, Tuple
 
 import torch
+import pickle
 
 from tqdm.auto import tqdm
 
@@ -136,6 +137,29 @@ def test_step(
     test_acc /= len(dataloader)
     return test_loss, test_acc
 
+def save_loss_dictionaries(
+    results: Dict[str, List[float]], target_dir: str, model_name: str
+) -> None:
+    """Saves training and testing loss dictionaries to a target directory.
+
+    Saves the training and testing loss dictionaries as a pickle file
+    in the target directory.
+
+    Args:
+      results: A dictionary of training and testing loss as well as training and
+               testing accuracy metrics. Each metric has a value in a list for
+               each epoch.
+               In the form: {train_loss: [...],
+                             train_acc: [...],
+                             test_loss: [...],
+                             test_acc: [...]}
+      target_dir: A string indicating the target directory to save the JSON file.
+      model_name: A string indicating the name of the model to be saved.
+    """
+    with open(f"{target_dir}/{model_name}_losses.pkl", "wb") as f:
+        pickle.dump(results, f)
+    print(f"Loss dictionaries saved in {target_dir}")
+
 
 from tqdm.auto import tqdm
 
@@ -143,6 +167,7 @@ from tqdm.auto import tqdm
 # 1. Create a train function that takes in various model parameters + optimizer + dataloaders + loss function
 def train(
     model: torch.nn.Module,
+    model_name: str,
     train_dataloader: torch.utils.data.DataLoader,
     test_dataloader: torch.utils.data.DataLoader,
     optimizer: torch.optim.Optimizer,
@@ -216,6 +241,9 @@ def train(
         results["test_loss"].append(test_loss)
         results["train_acc"].append(train_acc)
         results["test_acc"].append(test_acc)
+    
+    # 6. Save loss dictionaries to a target directory
+    save_loss_dictionaries(results=results, target_dir="models", model_name=model_name)
 
-    # 6. Return the filled results at the end of the epoch
+    # 7. Return the filled results at the end of the epoch
     return results
