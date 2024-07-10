@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 def create_dataloaders(
     train_dir: str,
     test_dir: str,
+    train_transform: transforms.Compose,
     transform: transforms.Compose,
     batch_size: int,
 ):
@@ -39,7 +40,7 @@ def create_dataloaders(
     """
 
     # Use ImageFolder to create Datasets
-    train_data = datasets.ImageFolder(train_dir, transform=transform)
+    train_data = datasets.ImageFolder(train_dir, transform=train_transform)
     test_data = datasets.ImageFolder(test_dir, transform=transform)
 
     train_dataloader = DataLoader(
