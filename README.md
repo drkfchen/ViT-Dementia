@@ -5,8 +5,8 @@ conda env create -f env.yml
 ```
 ```python
 # Train the model
-python train.py # To train the model built from scratch
-python train_transferlearning.py # To train the pre-trained model and fine-tune it according to your data
+python train.py --epochs n # To train the model built from scratch
+python train_transferlearning.py --epochs n # To train the pre-trained model and fine-tune it according to your data
 ```
 ```python
 # To see and plot the loss curve (in notebook)
